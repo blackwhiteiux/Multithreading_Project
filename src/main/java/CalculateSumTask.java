@@ -2,6 +2,7 @@ import java.util.List;
 import java.util.concurrent.Callable;
 
 public class CalculateSumTask implements Callable<Integer> {
+    private static final int SIMULATION_DELAY_MS = 200; // Константа вместо магического числа
     private final String taskName;
     private final List<Integer> taskNumbers;
 
@@ -15,16 +16,15 @@ public class CalculateSumTask implements Callable<Integer> {
         System.out.println("Номер задачи: " + taskName + " | Номер потока: " + Thread.currentThread().getName());
 
         try {
-            Thread.sleep(200);
+            Thread.sleep(SIMULATION_DELAY_MS);
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
+            throw new RuntimeException("Задача была прервана", e);
         }
-        int result = 0;
 
-        for(Integer list : taskNumbers){
-            result += list;
-        }
-        return result;
+        return taskNumbers.stream()
+                .mapToInt(Integer::intValue)
+                .sum();
     }
 
     public String getTaskName(){
